@@ -1,4 +1,4 @@
-package com.shoestore.app;
+package com.shoestore;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
