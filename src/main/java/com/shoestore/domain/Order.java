@@ -40,6 +40,12 @@ public class Order extends AbstractAuditingEntity {
     @Column(name = "recipient_address")
     private String recipientAddress;
 
+    // Snapshot: Lưu lại số tiền được giảm CỤ THỂ tại thời điểm đặt hàng.
+    // Lý do: Nếu sau này Voucher bị sửa từ giảm 50k xuống còn 10k,
+    // thì đơn hàng cũ vẫn phải hiển thị là đã giảm 50k (không được đổi).
+    @Column(name = "discount_amount")
+    private BigDecimal discountAmount;
+
     private String note;
 
     // --- RELATIONS ---
@@ -50,4 +56,9 @@ public class Order extends AbstractAuditingEntity {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderDetail> orderDetails = new ArrayList<>();
+
+    // Relation: Nối sang bảng Voucher để biết dùng mã nào (để thống kê)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "voucher_id")
+    private Voucher voucher;
 }
