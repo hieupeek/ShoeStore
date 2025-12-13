@@ -13,6 +13,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder // <--- DESIGN PATTERN: Builder
 public class User extends AbstractAuditingEntity {
 
     @Id
