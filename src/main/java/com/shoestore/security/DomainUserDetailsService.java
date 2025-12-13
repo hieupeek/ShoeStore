@@ -2,6 +2,9 @@ package com.shoestore.security;
 
 import com.shoestore.domain.User; // Entity của bạn
 import com.shoestore.repository.UserRepository;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,13 +15,10 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class DomainUserDetailsService implements UserDetailsService {
-
+    // DI
     private final UserRepository userRepository;
-
-    public DomainUserDetailsService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

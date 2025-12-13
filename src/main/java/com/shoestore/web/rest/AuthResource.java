@@ -7,19 +7,17 @@ import com.shoestore.service.dto.LoginResponseDTO;
 import com.shoestore.service.dto.RegisterDTO;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/auth")
 public class AuthResource {
 
     // Áp dụng Dependency Inversion: Chỉ gọi Interface, không gọi Class cụ thể
     private final AuthService authService;
-
-    public AuthResource(AuthService authService) {
-        this.authService = authService;
-    }
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterDTO registerDTO) {

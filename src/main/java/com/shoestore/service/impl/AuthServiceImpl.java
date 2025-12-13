@@ -14,6 +14,8 @@ import com.shoestore.service.dto.RegisterDTO;
 
 import com.shoestore.service.mapper.UserMapper;
 
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.shoestore.security.JwtTokenProvider; // Import class mới
 
 @Service
+@RequiredArgsConstructor
 @Transactional
 public class AuthServiceImpl implements AuthService {
 
@@ -30,18 +33,6 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper; // <--- Sử dụng Mapper
     private final JwtTokenProvider jwtTokenProvider; // <--- Sử dụng JwtTokenProvider
-
-    public AuthServiceImpl(UserRepository userRepository,
-            RoleRepository roleRepository,
-            PasswordEncoder passwordEncoder,
-            UserMapper userMapper,
-            JwtTokenProvider jwtTokenProvider) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.userMapper = userMapper;
-        this.jwtTokenProvider = jwtTokenProvider;
-    }
 
     @Override
     public User registerUser(RegisterDTO registerDTO) {
