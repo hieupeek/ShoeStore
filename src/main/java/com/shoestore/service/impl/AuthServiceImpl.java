@@ -2,16 +2,23 @@ package com.shoestore.service.impl;
 
 import com.shoestore.domain.Role;
 import com.shoestore.domain.User;
+
 import com.shoestore.repository.RoleRepository;
 import com.shoestore.repository.UserRepository;
+
 import com.shoestore.service.AuthService;
+
 import com.shoestore.service.dto.LoginDTO;
 import com.shoestore.service.dto.LoginResponseDTO;
 import com.shoestore.service.dto.RegisterDTO;
+
 import com.shoestore.service.mapper.UserMapper;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.shoestore.security.JwtTokenProvider; // Import class mới
 
 @Service
 @Transactional
@@ -22,15 +29,18 @@ public class AuthServiceImpl implements AuthService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper; // <--- Sử dụng Mapper
+    private final JwtTokenProvider jwtTokenProvider; // <--- Sử dụng JwtTokenProvider
 
     public AuthServiceImpl(UserRepository userRepository,
             RoleRepository roleRepository,
             PasswordEncoder passwordEncoder,
-            UserMapper userMapper) {
+            UserMapper userMapper,
+            JwtTokenProvider jwtTokenProvider) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.userMapper = userMapper;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     @Override
@@ -71,12 +81,12 @@ public class AuthServiceImpl implements AuthService {
             throw new IllegalArgumentException("Sai mật khẩu, vui lòng thử lại!");
         }
 
-        // 3. Tạo Token (Tạm thời dùng chuỗi String giả, bài sau sẽ lắp JWT vào đây)
-        String fakeToken = "TOKEN-FAKE-" + user.getUsername() + "-" + System.currentTimeMillis();
+        // Tạo JWT Token thật
+        String jwtToken = jwtTokenProvider.generateToken(user.getUsername());
 
         // 4. Trả về kết quả
         return LoginResponseDTO.builder()
-                .token(fakeToken)
+                .token(jwtToken)
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .role(user.getRole().getName())
