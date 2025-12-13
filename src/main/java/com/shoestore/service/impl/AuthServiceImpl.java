@@ -5,6 +5,8 @@ import com.shoestore.domain.User;
 import com.shoestore.repository.RoleRepository;
 import com.shoestore.repository.UserRepository;
 import com.shoestore.service.AuthService;
+import com.shoestore.service.dto.LoginDTO;
+import com.shoestore.service.dto.LoginResponseDTO;
 import com.shoestore.service.dto.RegisterDTO;
 import com.shoestore.service.mapper.UserMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -55,5 +57,29 @@ public class AuthServiceImpl implements AuthService {
 
         // 5. Persistence Logic
         return userRepository.save(user);
+    }
+
+    @Override
+    public LoginResponseDTO login(LoginDTO loginDTO) {
+        // 1. Tìm user trong DB
+        User user = userRepository.findByUsername(loginDTO.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("Tài khoản không tồn tại!"));
+
+        // 2. Kiểm tra mật khẩu (QUAN TRỌNG)
+        // Tuyệt đối không dùng dấu == hoặc .equals() vì pass trong DB đã mã hóa
+        if (!passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Sai mật khẩu, vui lòng thử lại!");
+        }
+
+        // 3. Tạo Token (Tạm thời dùng chuỗi String giả, bài sau sẽ lắp JWT vào đây)
+        String fakeToken = "TOKEN-FAKE-" + user.getUsername() + "-" + System.currentTimeMillis();
+
+        // 4. Trả về kết quả
+        return LoginResponseDTO.builder()
+                .token(fakeToken)
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .role(user.getRole().getName())
+                .build();
     }
 }
