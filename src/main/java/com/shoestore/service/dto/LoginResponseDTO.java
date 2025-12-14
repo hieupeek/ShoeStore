@@ -7,7 +7,8 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class LoginResponseDTO {
-    private String token; // Quan trọng nhất (sẽ chứa JWT sau này)
+    private String token; // Access Token
+    private String refreshToken; // Refresh Token
     private String username;
     private String email;
     private String role;

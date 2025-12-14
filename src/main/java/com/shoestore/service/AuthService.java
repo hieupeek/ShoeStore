@@ -10,4 +10,8 @@ public interface AuthService {
 
     // Thêm hàm này
     LoginResponseDTO login(LoginDTO loginDTO);
+
+    // Refresh Token
+    com.shoestore.service.dto.TokenRefreshResponseDTO refreshToken(
+            com.shoestore.service.dto.TokenRefreshRequestDTO request);
 }

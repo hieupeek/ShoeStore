@@ -41,4 +41,14 @@ public class AuthResource {
             return ResponseEntity.status(401).body(e.getMessage());
         }
     }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken(
+            @Valid @RequestBody com.shoestore.service.dto.TokenRefreshRequestDTO request) {
+        try {
+            return ResponseEntity.ok(authService.refreshToken(request));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(403).body(e.getMessage());
+        }
+    }
 }
