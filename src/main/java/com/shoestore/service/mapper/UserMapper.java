@@ -1,5 +1,6 @@
 package com.shoestore.service.mapper;
 
+import com.shoestore.domain.enumeration.AuthenticationProvider;
 import com.shoestore.domain.User;
 import com.shoestore.service.dto.RegisterDTO;
 import org.springframework.stereotype.Component;
@@ -20,6 +21,8 @@ public class UserMapper {
                 .fullName(dto.getFullName())
                 .email(dto.getEmail())
                 .status(1) // Mặc định Active
+                // THÊM DÒNG NÀY: Mặc định là tài khoản thường
+                .provider(AuthenticationProvider.LOCAL)
                 .build();
     }
 }

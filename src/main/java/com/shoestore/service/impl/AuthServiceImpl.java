@@ -2,16 +2,28 @@ package com.shoestore.service.impl;
 
 import com.shoestore.domain.Role;
 import com.shoestore.domain.User;
+
 import com.shoestore.repository.RoleRepository;
 import com.shoestore.repository.UserRepository;
+
 import com.shoestore.service.AuthService;
+
+import com.shoestore.service.dto.LoginDTO;
+import com.shoestore.service.dto.LoginResponseDTO;
 import com.shoestore.service.dto.RegisterDTO;
+
 import com.shoestore.service.mapper.UserMapper;
+
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.shoestore.security.JwtTokenProvider; // Import class mới
+
 @Service
+@RequiredArgsConstructor
 @Transactional
 public class AuthServiceImpl implements AuthService {
 
@@ -20,16 +32,8 @@ public class AuthServiceImpl implements AuthService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper; // <--- Sử dụng Mapper
-
-    public AuthServiceImpl(UserRepository userRepository,
-            RoleRepository roleRepository,
-            PasswordEncoder passwordEncoder,
-            UserMapper userMapper) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.userMapper = userMapper;
-    }
+    private final JwtTokenProvider jwtTokenProvider; // <--- Sử dụng JwtTokenProvider
+    private final com.shoestore.service.RefreshTokenService refreshTokenService;
 
     @Override
     public User registerUser(RegisterDTO registerDTO) {
@@ -55,5 +59,49 @@ public class AuthServiceImpl implements AuthService {
 
         // 5. Persistence Logic
         return userRepository.save(user);
+    }
+
+    @Override
+    public LoginResponseDTO login(LoginDTO loginDTO) {
+        // 1. Tìm user trong DB
+        User user = userRepository.findByUsername(loginDTO.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("Tài khoản không tồn tại!"));
+
+        // 2. Kiểm tra mật khẩu (QUAN TRỌNG)
+        // Tuyệt đối không dùng dấu == hoặc .equals() vì pass trong DB đã mã hóa
+        if (!passwordEncoder.matches(loginDTO.getPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Sai mật khẩu, vui lòng thử lại!");
+        }
+
+        // Tạo JWT Token thật
+        String jwtToken = jwtTokenProvider.generateToken(user.getUsername());
+
+        // Tạo Refresh Token
+        com.shoestore.domain.RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getUsername());
+
+        // 4. Trả về kết quả
+        return LoginResponseDTO.builder()
+                .token(jwtToken)
+                .refreshToken(refreshToken.getToken())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .role(user.getRole().getName())
+                .build();
+    }
+
+    @Override
+    public com.shoestore.service.dto.TokenRefreshResponseDTO refreshToken(
+            com.shoestore.service.dto.TokenRefreshRequestDTO request) {
+        return refreshTokenService.findByToken(request.getRefreshToken())
+                .map(refreshTokenService::verifyExpiration)
+                .map(com.shoestore.domain.RefreshToken::getUser)
+                .map(user -> {
+                    String token = jwtTokenProvider.generateToken(user.getUsername());
+                    return com.shoestore.service.dto.TokenRefreshResponseDTO.builder()
+                            .accessToken(token)
+                            .refreshToken(request.getRefreshToken())
+                            .build();
+                })
+                .orElseThrow(() -> new IllegalArgumentException("Refresh token is not in database!"));
     }
 }

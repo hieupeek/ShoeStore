@@ -1,6 +1,10 @@
 package com.shoestore.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.shoestore.domain.enumeration.AuthenticationProvider;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -39,6 +43,14 @@ public class User extends AbstractAuditingEntity {
     private String avatar;
 
     private Integer status; // 1: Active, 0: Blocked
+
+    // THÊM 2 FIELD NÀY:
+    @Enumerated(EnumType.STRING)
+    @Column(name = "provider")
+    private AuthenticationProvider provider;
+
+    @Column(name = "provider_id")
+    private String providerId;
 
     // --- RELATIONS ---
 
