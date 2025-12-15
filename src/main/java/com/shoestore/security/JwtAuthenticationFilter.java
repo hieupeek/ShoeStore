@@ -21,6 +21,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
+    // DI
     private final JwtTokenProvider jwtTokenProvider;
     private final UserDetailsService userDetailsService; // Spring Security tự có cái này
 
@@ -33,10 +34,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = getTokenFromRequest(request);
 
         // 2. Kiểm tra token có hợp lệ không
-        if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
+        if (StringUtils.hasText(token) && jwtTokenProvider.validateAccessToken(token)) {
 
             // 3. Lấy username từ token
-            String username = jwtTokenProvider.getUsernameFromToken(token);
+            String username = jwtTokenProvider.getUsernameFromAccessToken(token);
 
             // 4. Load thông tin user từ DB lên
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);

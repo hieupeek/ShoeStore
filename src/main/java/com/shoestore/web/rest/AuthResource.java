@@ -1,10 +1,13 @@
 package com.shoestore.web.rest;
 
+import com.shoestore.constant.Constant;
+
 import com.shoestore.service.AuthService;
 
 import com.shoestore.service.dto.LoginDTO;
 import com.shoestore.service.dto.LoginResponseDTO;
 import com.shoestore.service.dto.RegisterDTO;
+import com.shoestore.service.dto.TokenRefreshRequestDTO;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +26,7 @@ public class AuthResource {
     public ResponseEntity<?> register(@Valid @RequestBody RegisterDTO registerDTO) {
         try {
             authService.registerUser(registerDTO);
-            return ResponseEntity.ok("Đăng ký thành công!");
+            return ResponseEntity.ok(Constant.SUCCESS_REGISTER);
         } catch (IllegalArgumentException | IllegalStateException e) {
             // Xử lý lỗi tập trung
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -44,7 +47,7 @@ public class AuthResource {
 
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshToken(
-            @Valid @RequestBody com.shoestore.service.dto.TokenRefreshRequestDTO request) {
+            @Valid @RequestBody TokenRefreshRequestDTO request) {
         try {
             return ResponseEntity.ok(authService.refreshToken(request));
         } catch (IllegalArgumentException e) {

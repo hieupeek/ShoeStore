@@ -17,4 +17,8 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
     // Xóa token của user (Dùng khi Logout hoặc xóa user)
     @Modifying
     int deleteByUser(User user);
+
+    // Xóa token (Dùng khi Logout)
+    @Modifying
+    void deleteByToken(String token);
 }

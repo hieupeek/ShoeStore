@@ -18,7 +18,7 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
 
-        # Cấu hình JWT
+# Cấu hình JWT
 app:
   jwt:
     # Chuỗi bí mật dùng để ký token (Tuyệt đối không để lộ)
@@ -28,6 +28,6 @@ app:
     # Thời gian hết hạn của Access Token (tính bằng mili giây)
     # 86400000 ms = 24 giờ (Để dài test cho dễ, sau này chỉnh xuống 15p sau)
     expiration: 86400000
-    
+
     # Thời gian hết hạn của Refresh Token (7 ngày)
     refresh-expiration: 604800000

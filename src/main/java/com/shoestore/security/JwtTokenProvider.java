@@ -6,6 +6,8 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.shoestore.constant.Constant;
+
 import java.security.Key;
 import java.util.Date;
 
@@ -19,8 +21,8 @@ public class JwtTokenProvider {
     @Value("${app.jwt.expiration}")
     private long jwtExpiration;
 
-    // 1. Tạo Token từ Username
-    public String generateToken(String username) {
+    // 1. Tạo access Token từ Username
+    public String generateAccessToken(String username) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpiration);
 
@@ -32,8 +34,8 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    // 2. Lấy Username từ Token (Giải mã)
-    public String getUsernameFromToken(String token) {
+    // 2. Lấy Username từ access Token (Giải mã)
+    public String getUsernameFromAccessToken(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(getSignInKey())
                 .build()
@@ -43,18 +45,18 @@ public class JwtTokenProvider {
     }
 
     // 3. Validate Token
-    public boolean validateToken(String token) {
+    public boolean validateAccessToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(getSignInKey()).build().parseClaimsJws(token);
             return true;
         } catch (MalformedJwtException ex) {
-            System.err.println("Invalid JWT token");
+            System.err.println(Constant.ERROR_INVALID_JWT_TOKEN);
         } catch (ExpiredJwtException ex) {
-            System.err.println("Expired JWT token");
+            System.err.println(Constant.ERROR_EXPIRED_JWT_TOKEN);
         } catch (UnsupportedJwtException ex) {
-            System.err.println("Unsupported JWT token");
+            System.err.println(Constant.ERROR_UNSUPPORTED_JWT_TOKEN);
         } catch (IllegalArgumentException ex) {
-            System.err.println("JWT claims string is empty");
+            System.err.println(Constant.ERROR_ILLEGAL_JWT_TOKEN);
         }
         return false;
     }
